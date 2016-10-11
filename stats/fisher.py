@@ -13,6 +13,7 @@ def fisher_2d(a, b, c, d, verbose=True):
 
     Return a/b, odds ratio, p-value
     """
+    from scipy.stats import fisher_exact
     pct = 1. * a / b
     oddsratio, pvalue = fisher_exact([[a, b-a], [c-a, d-b-c+a]])
     if verbose:
