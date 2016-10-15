@@ -1,34 +1,34 @@
-"""Modules for statistics functions
+"""Fisher's Exact test.
+
+Wrapper functions of scipy.stats.fisher_exact.
+
+TODO:
+  * Add doctests
 """
 
-__version__ = '0.1.161009'
+__version__ = '0.1.161015'
 __author__ = 'Cho-Yi Chen'
 
-def fisher_2d(a, b, c, d, verbose=True):
-    """Fisher's exact test by giving a 2-dim contigency table:
+def _test_by_marginal_numbers(a, b, c, d):
+    """Fisher's exact test by giving marginal numbers from a 2-dim contigency table:
 
     a     (b-a)    b
     (c-a) (d-b-c+a)
     c              d
 
-    Return a/b, odds ratio, p-value
+    Return odds ratio, p-value.
     """
     from scipy.stats import fisher_exact
-    pct = 1. * a / b
     oddsratio, pvalue = fisher_exact([[a, b-a], [c-a, d-b-c+a]])
-    if verbose:
-        print "%d/%d = %d%%" % (a, b, pct * 100)
-        print "Odds ratio: %.2f" % oddsratio
-        print "P-value: %.2e" % pvalue
-    return pct, oddsratio, pvalue
+    return oddsratio, pvalue
 
-def fisher_enrichment(u, v, U, V, verbose=True):
+def _test_by_set_sizes(u, v, U, V):
     """Fisher's exact test by giving two sets.
 
     u, U: gene set u and its universe U
     v, V: gene set v and its universe V
 
-    Return percentage, odds ratio, p-value
+    Return odds ratio, p-value.
     """
     background = U & V  # consensus background
     nu = u & background  # new u
@@ -37,5 +37,32 @@ def fisher_enrichment(u, v, U, V, verbose=True):
     b = len(nu)
     c = len(nv)
     d = len(background)
-    return fisher_2d(a, b, c, d, verbose)
+    return _test_by_marginal_numbers(a, b, c, d)
+
+def fisher_exact_test(a, b, c, d, verbose=True):
+    """Fisher's exact test by giving marginal numbers or sets.
+
+    If a, b, c, d, were numbers, they should represent marginal numbers in a contigency table.
+
+    a     (b-a)    b
+    (c-a) (d-b-c+a)
+    c              d
+
+    If a, b, c, d, were sets, they should represent two gene sets and their background sets.
+
+    a, b: gene set a and its universe b
+    c, d: gene set c and its universe d
+
+    Return odds ratio, p-value.
+    """
+    if all([isinstance(i, int) for i in (a,b,c,d)]):
+        # call by giving four marginal numbers in a contigency table
+        oddsratio, pvalue =  _test_by_marginal_numbers(a,b,c,d)
+    if all([isinstance(i, set) for i in (a,b,c,d)]):
+        # call by giving two gene sets and their background sets
+        oddsratio, pvalue =  _test_by_set_sizes(a,b,c,d)
+    if verbose:
+        print "Odds ratio: %.2f" % oddsratio
+        print "P-value: %.2e" % pvalue
+    return oddsratio, pvalue
 

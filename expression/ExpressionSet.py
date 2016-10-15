@@ -23,6 +23,7 @@ __author__ = "Cho-Yi Chen"
 importr('Biobase')
 pandas2ri.activate()
 
+
 def _read_ExpressionSet(RData):
     """Read ExpressionSet RData into Rpy2 robjects
 
@@ -40,6 +41,7 @@ def _read_ExpressionSet(RData):
     pData = r.pData(obj)          # rpy2 DataFrame object
     print r.obj
     return assayData, fData, pData
+
 
 def _write_ExpressionSet(exprs, fData, pData, RData):
     """Write dataframes to RData as a single-assay ExpressionSet object
@@ -61,6 +63,7 @@ def _write_ExpressionSet(exprs, fData, pData, RData):
     r("eSet = ExpressionSet(assayData=as.matrix(exprs), featureData=AnnotatedDataFrame(fdata), phenoData=AnnotatedDataFrame(pdata))")
     r("eSet")
     r("save(eSet, file=rdata)")
+
 
 def _parse_assayData(assayData, assay=None):
     """Parse Rpy2 assayData (Environment object)
@@ -91,6 +94,7 @@ def _parse_assayData(assayData, assay=None):
         print '\t%s: %d features, %d samples' % (k, len(genes), len(samples))
     return D
 
+
 def _parse_rdf(rdf, categorical_columns='auto'):
     """Parse Rpy2 DataFrame
 
@@ -118,6 +122,7 @@ def _parse_rdf(rdf, categorical_columns='auto'):
     print df.index
     return df
 
+
 def ExpressionSet2DataFrames(RData, assay=None, fFactors='auto', pFactors='auto'):
     """ExpressionSet (RData) to pandas dataframes
 
@@ -138,6 +143,7 @@ def ExpressionSet2DataFrames(RData, assay=None, fFactors='auto', pFactors='auto'
     feature_df = _parse_rdf(fData, fFactors)
     phenotype_df = _parse_rdf(pData, pFactors)
     return assay_dfs, feature_df, phenotype_df
+
 
 def ExpressionSet2HDF5(RData, HDF5, **kwargs):
     """ExpressionSet (RData) to HDF5 (pandas dataframes)
@@ -161,6 +167,7 @@ def ExpressionSet2HDF5(RData, HDF5, **kwargs):
     print '\tpData: %d samples, %d variables' % (pData.shape[0], pData.shape[1])
     store.close()
 
+
 def DataFrames2ExpressionSet(exprs, fData, pData, RData):
     """Write dataframes to RData as a single-assay ExpressionSet object
 
@@ -183,4 +190,3 @@ def DataFrames2ExpressionSet(exprs, fData, pData, RData):
     print "%d feature attributes" % fData.shape[1]
     print "%d phenotype variables" % pData.shape[1]
     _write_ExpressionSet(exprs, fData, pData, RData)
-
