@@ -37,6 +37,12 @@ class ExpressionSet(object):
     True
     >>> 'GTEX.ZXG5.0011.R7b.SM.57WCC' in eSet
     True
+
+    Get/set the metadata:
+
+    >>> eSet.meta['title'] = "Title of the eSet"
+    >>> print eSet.meta['title']
+    Title of the eSet
     """
     def __init__(self, exprs, fData=None, pData=None, **kwargs):
         self.exprs = exprs  # property
