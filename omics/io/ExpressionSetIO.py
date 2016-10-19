@@ -26,7 +26,7 @@ from rpy2.robjects import r
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 
-from omics.expression.ExpressionSet import ExpressionSet
+from ..expression.ExpressionSet import ExpressionSet
 
 __author__ = "Cho-Yi Chen"
 __version__ = "2016.10.16"
