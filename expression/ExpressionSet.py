@@ -7,6 +7,9 @@ Note:
 
 Reference:
   * https://www.bioconductor.org/packages/release/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf
+
+Todo:
+  * Add tests.
 """
 import pandas as pd
 
@@ -16,14 +19,24 @@ __version__ = "2016.10.16"
 class ExpressionSet(object):
     """ExpressionSet class mimics R's Bioconductor ExpressionSet.
 
-    Usage:
-        eSet = ExpressionSet(exprs, fData=None, pData=None, **kwargs)
+    Usage
+    -----
 
-    Arguments:
-        exprs: expression dataframe (genes x samples)
-        fData: feature dataframe (genes x features)
-        pData: phenotype dataframe (samples x phenotypes)
-        kwargs: metadata (e.g., title) (saved in eSet.meta)
+    Create an ExpressionSet instance:
+
+      eSet = ExpressionSet(exprs, fData=None, pData=None, **kwargs)
+
+      exprs: expression dataframe (genes x samples)
+      fData: feature dataframe (genes x features)
+      pData: phenotype dataframe (samples x phenotypes)
+      kwargs: metadata (e.g., title) (saved in eSet.meta)
+
+    Test if a given sample/gene exists in the eSet:
+
+    >>> 'ENSG00000000003' in eSet
+    True
+    >>> 'GTEX.ZXG5.0011.R7b.SM.57WCC' in eSet
+    True
     """
     def __init__(self, exprs, fData=None, pData=None, **kwargs):
         self.exprs = exprs  # property
@@ -37,18 +50,21 @@ class ExpressionSet(object):
               'fData: {} features, {} attributes\n'
               'pData: {} samples, {} variables\n'
               'features: {}, ..., {}\n'
-              'samples: {}, ..., {}\n')
-        s2 = s1.format(self.meta.get('title', 'ExpressionSet instance'),
-                       self._exprs.shape[0], self._exprs.shape[1],
-                       self._fData.shape[0], self._fData.shape[1],
-                       self._pData.shape[0], self._pData.shape[1],
-                       self._exprs.index[0], self._exprs.index[-1],
-                       self._exprs.columns[0], self._exprs.columns[-1])
-        s3 = '\n'.join(["{}: {}".format(k, v) for k,v in self.meta.iteritems() if k != 'title'])
-        return s2 + s3
+              'samples: {}, ..., {}\n').format(
+              self.meta.get('title', 'ExpressionSet instance'),
+              self._exprs.shape[0], self._exprs.shape[1],
+              self._fData.shape[0], self._fData.shape[1],
+              self._pData.shape[0], self._pData.shape[1],
+              self._exprs.index[0], self._exprs.index[-1],
+              self._exprs.columns[0], self._exprs.columns[-1])
+        s2 = '\n'.join(["{}: {}".format(k, v) for k,v in self.meta.iteritems() if k != 'title'])
+        return s1 + s2
 
     def __repr__(self):
         return self.__str__()
+
+    def __contains__(self, item):
+        return item in self._exprs or item in self._exprs.index
 
     def subset(self, features=slice(None), samples=slice(None)):
         """Subset by given features/samples.

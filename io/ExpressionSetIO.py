@@ -15,6 +15,9 @@ Output:
 References:
   * http://pandas.pydata.org/pandas-docs/stable/r_interface.html
   * https://www.bioconductor.org/packages/release/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf
+
+Todo:
+  * Add tests.
 """
 import readline
 
@@ -162,7 +165,7 @@ def ExpressionSet2RData(eSet, RData, verbose=True):
     r("save(eSet, file=rdata)")
     if verbose:
         print "Saving eSet to", RData
-        r("eSet")
+        print r.eSet
 
 def ExpressionSet2HDF5(eSet, HDF5, verbose=True):
     """Write ExpressionSet to HDF5 as a buch of Pandas dataframes
