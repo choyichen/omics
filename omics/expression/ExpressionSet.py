@@ -3,7 +3,7 @@
 ExpressionSet class mimics R's Bioconductor ExpressionSet.
 
 Note:
-  * See pybcb.io.ExpressionSetIO for associated I/O functions.
+  * See omics.io.ExpressionSetIO for associated I/O functions.
 
 Reference:
   * https://www.bioconductor.org/packages/release/bioc/vignettes/Biobase/inst/doc/ExpressionSetIntroduction.pdf

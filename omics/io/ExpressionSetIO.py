@@ -1,4 +1,4 @@
-"""I/O functions that operate on pybcb ExpressionSet objects.
+"""I/O functions that operate on omics ExpressionSet objects.
 
 Supported:
   * I/O from/to Bioconductor ExpressionSet (RData)
@@ -26,7 +26,7 @@ from rpy2.robjects import r
 from rpy2.robjects import pandas2ri
 from rpy2.robjects.packages import importr
 
-from pybcb.expression.ExpressionSet import ExpressionSet
+from omics.expression.ExpressionSet import ExpressionSet
 
 __author__ = "Cho-Yi Chen"
 __version__ = "2016.10.16"
@@ -95,7 +95,7 @@ def _parse_rdataframe(rdf, factor_cols='auto'):
 # ================================================================================
 
 def RData2ExpressionSet(RData, assay='exprs', fFactors='auto', pFactors='auto', verbose=True, **kwargs):
-    """Read R's ExpressionSet (RData) to pybcb's ExpressionSet (eSet)
+    """Read R's ExpressionSet (RData) to omics ExpressionSet (eSet)
 
     RData: Path to the input RData file with only one eSet object inside.
     assay: Assay name to be loaded.
@@ -104,7 +104,7 @@ def RData2ExpressionSet(RData, assay='exprs', fFactors='auto', pFactors='auto', 
       If None, do nothing and use the default dtypes.
     kwargs: Keyword arguments passed to ExpressionSet constructor
 
-    Return a pybcb's ExpressionSet object (eSet).
+    Return a omics ExpressionSet object (eSet).
     """
     # Read RData into Rpy2 robjects
     r_eSet, r_assayData, r_fData, r_pData = _read_ExpressionSet_RData(RData)
@@ -148,7 +148,7 @@ def HDF52ExpressionSet(HDF5, exprs='exprs', fData='fData', pData='pData', meta='
 def ExpressionSet2RData(eSet, RData, verbose=True):
     """Write ExpressionSet to RData as a single-assay ExpressionSet object
 
-    eSet:  A pybcb ExpressionSet object
+    eSet:  A omics ExpressionSet object
     RData: Output RData filename
 
     Note: Mutiple assay data currently not supported in this version.
@@ -170,7 +170,7 @@ def ExpressionSet2RData(eSet, RData, verbose=True):
 def ExpressionSet2HDF5(eSet, HDF5, verbose=True):
     """Write ExpressionSet to HDF5 as a buch of Pandas dataframes
 
-    eSet:  A pybcb ExpressionSet object
+    eSet:  A omics ExpressionSet object
     HDF5: Output HDF5 filename
 
     Note: Mutiple assay data currently not supported in this version.
