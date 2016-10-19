@@ -3,20 +3,25 @@
 See:
 https://packaging.python.org/en/latest/distributing.html
 https://github.com/pypa/sampleproject
+https://pypi.python.org/pypi?%3Aaction=list_classifiers
 """
 
 from setuptools import setup, find_packages
+import omics as pkg  # change 'omics' to your package name
+
+# Get the long description from README.md
+with open('README.md') as f:
+    long_description = f.read()
 
 setup(
-    name='omics',
-    # See https://packaging.python.org/distributing/#version
-    version='0.1.0',
-    description='A Python package for omics data analysis.',
-    url='https://github.com/choyichen/omics',
-    author='Cho-Yi (Joey) Chen',
-    author_email='ntu.joey@gmail.com',
-    license='MIT',
-    # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    name=pkg.__name__,
+    version=pkg.__version__,
+    description=pkg.__doc__.split('\n')[0]
+    long_description=long_description,
+    url=pkg.__url__,
+    author=pkg.__author__,
+    author_email=pkg.__email__,
+    license=pkg.__license__,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Science/Research',
