@@ -16,7 +16,7 @@ with open('README.md') as f:
 setup(
     name=pkg.__name__,
     version=pkg.__version__,
-    description=pkg.__doc__.split('\n')[0]
+    description=pkg.__doc__.split('\n')[0],
     long_description=long_description,
     url=pkg.__url__,
     author=pkg.__author__,
