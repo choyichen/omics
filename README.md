@@ -1,2 +1,3 @@
-# pybcb
-A Python package for biostatistics and computational biology
+# Omics
+A Python package for [omics](https://en.wikipedia.org/wiki/Omics) data analysis, with main focus on integrative genomics.
+
