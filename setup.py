@@ -31,6 +31,7 @@ setup(
     ],
     keywords='bioinformatics biostatistics genomics',
     packages=find_packages(),
+    scripts=['scripts/biomaRt.py']
     install_requires=[
         'numpy',
         'scipy',
