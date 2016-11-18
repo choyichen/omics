@@ -31,11 +31,12 @@ setup(
     ],
     keywords='bioinformatics biostatistics genomics',
     packages=find_packages(),
-    scripts=['scripts/biomaRt.py'],
+    scripts=['scripts/biomart.py'],
     install_requires=[
         'numpy',
         'scipy',
         'matplotlib',
+        'seaborn',
         'pandas',
         'rpy2'
     ]

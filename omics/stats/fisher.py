@@ -1,12 +1,9 @@
 """Fisher's Exact test.
 
-Wrapper functions of scipy.stats.fisher_exact.
-
-TODO:
-  * Add doctests
+Wrapper of scipy.stats.fisher_exact.
 """
 
-__version__ = '0.1.161015'
+__version__ = '16.11.16'
 __author__ = 'Cho-Yi Chen'
 
 def _test_by_marginal_numbers(a, b, c, d):
@@ -54,6 +51,34 @@ def fisher_exact_test(a, b, c, d, verbose=True):
     c, d: gene set c and its universe d
 
     Return odds ratio, p-value.
+
+    Examples:
+
+    >>> odds, pval = fisher_exact_test(8, 10, 9, 16)
+    Odds ratio: 20.00
+    P-value: 3.50e-02
+
+    >>> odds, pval = fisher_exact_test(5, 5, 6, 10)
+    Odds ratio: inf
+    P-value: 4.76e-02
+
+    >>> odds, pval = fisher_exact_test(43, 45, 60, 69)
+    Odds ratio: 8.85
+    P-value: 6.65e-03
+
+    >>> u = set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    >>> U = set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+    >>> v = set([1, 2, 3, 4, 5, 6, 7, 8, 11])
+    >>> V = set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
+    >>> odds, pval = fisher_exact_test(u, v, U, V)
+    Odds ratio: 20.00
+    P-value: 3.50e-02
+
+    References:
+
+    * http://docs.scipy.org/doc/scipy-0.17.0/reference/generated/scipy.stats.fisher_exact.html
+    * http://mathworld.wolfram.com/FishersExactTest.html
+    * http://udel.edu/~mcdonald/statfishers.html
     """
     if all([isinstance(i, int) for i in (a,b,c,d)]):
         # call by giving four marginal numbers in a contigency table
@@ -66,3 +91,6 @@ def fisher_exact_test(a, b, c, d, verbose=True):
         print "P-value: %.2e" % pvalue
     return oddsratio, pvalue
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
