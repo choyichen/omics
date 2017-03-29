@@ -110,8 +110,8 @@ def RData2ExpressionSet(RData, assay='exprs', fFactors='auto', pFactors='auto', 
     r_eSet, r_assayData, r_fData, r_pData = _read_ExpressionSet_RData(RData)
     # Parse assayData, fData, and pData
     exprs = _parse_assayData(r_assayData, assay)
-    fData = _parse_rdataframe(r_fData, fFactors)
-    pData = _parse_rdataframe(r_pData, pFactors)
+    fData = _parse_rdataframe(r_fData, fFactors) if len(r_fData) > 0 else None
+    pData = _parse_rdataframe(r_pData, pFactors) if len(r_pData) > 0 else None
     # Add metadata
     kwargs['source'] = RData
     if verbose:

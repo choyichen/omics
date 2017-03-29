@@ -12,20 +12,31 @@ Plot 2D or 3D PCA with samples colored by metadata:
 
   * plot_2d_pca_plot: create and return a seaborn lmplot object
   * plot_3d_pca_plot: create and return a pyplot figure object
+
+3. plot_explained_variance_ratio
+
+Show the explained variance ratios of PCs in a barplot.
+
+4. pca_on_cov_matrix
+
+Run PCA on a covariance/correlation matrix.
 """
-from pylab import *
+import numpy as np
 import pandas as pd
 
 __author__ =  "Cho-Yi (Joey) Chen"
-__version__ = "16.11.20"
+__version__ = "17.01.23"
 
 def run_pca(df, using="pca", pc=3, verbose=True):
-    """Run PCA on a sample-by-feature dataframe.
+    """Run sklearn's PCA on a sample-by-feature dataframe.
 
     df: a dataframe where rows are samples (observations) and columns are features.
     using: pca/mds/tsne
     pc: how many PCs you need
     verbose: additional informaion output
+
+    Note: sklearn uses the LAPACK implementation of the full SVD.
+          This function doesn't rescale the input data by default.
 
     Return a tuple: (sklearn's PCA object, transformed dataframe).
     """
@@ -47,13 +58,14 @@ def run_pca(df, using="pca", pc=3, verbose=True):
     if verbose:
         print "Data dimensions (samples-by-features):", df.shape
         if using == "pca":
-            print "Variance explained by top %d PCs:" % pc, pca.explained_variance_ratio_
+            print "Variance explained by top %d PCs:" % pc
+            print ', '.join(["%.3g" % i for i in pca.explained_variance_ratio_])
     return pca, out
 
 def plot_2d_pca(pca, data, pData=None, hue=None, title=None, **kwargs):
     """Plot 2D PCA.
 
-    pca: PCA object derived from run_pca (at least 2 PCs)
+    pca: sklearn's PCA object derived from run_pca (at least 2 PCs)
     data: transformed dataframe after pca (column names are 'PC1', 'PC2', ...)
     pData: phenotype dataframe for samples (optional).
     hue: variable name in pData for sample annotation (optional).
@@ -75,7 +87,7 @@ def plot_2d_pca(pca, data, pData=None, hue=None, title=None, **kwargs):
 def plot_3d_pca(pca, data, pData=None, hue=None, title=None, figure=None, marker='o', alpha=0.8, ms=4, **kwargs):
     """Plot 3D PCA.
 
-    pca: PCA object derived from run_pca.
+    pca: sklearn's PCA object derived from run_pca.
     data: transformed dataframe after pca.
     pData: phenotype data for samples (optional).
     hue: variable name in pData for sample annotation (optional).
@@ -85,7 +97,6 @@ def plot_3d_pca(pca, data, pData=None, hue=None, title=None, figure=None, marker
 
     Return a tuple: (figure object, axes object).
     """
-    import numpy as np
     import matplotlib.pyplot as plt
     from mpl_toolkits.mplot3d import Axes3D
 
@@ -115,7 +126,7 @@ def plot_3d_pca(pca, data, pData=None, hue=None, title=None, figure=None, marker
         plt.legend(loc=0, fontsize='small')
     else:
         # no color mapping
-        plot(x, y, z, 'o', **kwargs)
+        plt.plot(x, y, z, 'o', **kwargs)
 
     ax.set_xlabel('PC1 (%.1f%% var)' % (pca.explained_variance_ratio_[0] * 100))
     ax.set_ylabel('PC2 (%.1f%% var)' % (pca.explained_variance_ratio_[1] * 100))
@@ -144,10 +155,10 @@ def plot_pca(pca, data, pc=2, **kwargs):
     else:
         raise e, "PC > 3 is not supported!"
 
-def plot_explained_variance_ratio(pca, figsize=(4,3), **kwargs):
+def plot_explained_variance_ratio(y, figsize=(4,3), **kwargs):
     """Compare the explained variance ratios of PCs in a barplot.
 
-    pca: a pca object.
+    y: explained variance ratio, e.g., pca.explained_variance_ratio_
     figsize: pass to pyplot.figure()
     kwargs: pass to seaborn.barplot()
 
@@ -156,8 +167,53 @@ def plot_explained_variance_ratio(pca, figsize=(4,3), **kwargs):
     import matplotlib.pyplot as plt
     import seaborn as sns
     fig = plt.figure(figsize=figsize)
-    y = pca.explained_variance_ratio_
     ax = sns.barplot(range(1, len(y)+1), y, **kwargs)
     ax.set_xlabel('PC')
     ax.set_ylabel('Explained variance ratio')
     sns.despine()
+
+def plot_explained_variance_ratio2(y, figsize=(4,3)):
+    """Compare the explained variance ratios of PCs in a barplot.
+
+    y: explained variance ratio, e.g., pca.explained_variance_ratio_
+    figsize: pass to pyplot.figure()
+
+    Recommended style: 'white'.
+    """
+    import matplotlib.pyplot as plt
+    cum_var_exp = np.cumsum(y)
+    n = len(y)
+    plt.figure(figsize)
+    plt.bar(range(1, n+1), var_exp[:n], alpha=0.5, align='center', label='individual explained variance')
+    plt.step(range(1, n+1), cum_var_exp[:n], where='mid', label='cumulative explained variance')
+    plt.ylabel('Explained variance ratio')
+    plt.xlabel('Principal components')
+    plt.xlim(0, n+1)
+    plt.legend(loc='best')
+    plt.tight_layout()
+
+def pca_on_cov_matrix(mat):
+    """PCA on covariance/correlation matrix.
+
+    mat: can be covariance matrix, standardized covariance matrix, or correlation matrix.
+    
+    The correlation matrix can be understood as the normalized covariance matrix.
+
+    Return: sorted (eigenvalue, eigenvector) list, explained variance ratio list, projection matrix W.
+
+    Note: Projection Onto the New Feature Space can be yieled by Y = X.dot(W), 
+          where X is the raw samples x features matrix.
+
+    Adapted from: http://sebastianraschka.com/Articles/2015_pca_in_3_steps.html
+    """
+    eig_vals, eig_vecs = np.linalg.eig(mat)
+    # Make a list of (eigenvalue, eigenvector) tuples
+    eig_pairs = [(np.abs(eig_vals[i]), eig_vecs[:,i]) for i in range(len(eig_vals))]
+    # Sort the (eigenvalue, eigenvector) tuples from high to low
+    eig_pairs.sort(key=lambda x: x[0], reverse=True)
+    # Explained Variance
+    var_exp = [(i / sum(eig_vals)) * 100 for i in sorted(eig_vals, reverse=True)]
+    # Projection Matrix
+    n = mat.shape[0]
+    W = np.hstack([eig_vec.reshape(n, 1) for (eig_val, eig_vec) in eig_pairs])
+    return eig_pairs, var_exp, W
